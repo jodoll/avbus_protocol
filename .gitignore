@@ -100,4 +100,6 @@ platformio_local.ini
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
 .history
+#Mac
+.DS_Store
 # End of https://www.gitignore.io/api/cmake,clion+all,platformio,visualstudiocode
