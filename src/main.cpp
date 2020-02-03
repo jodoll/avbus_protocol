@@ -67,9 +67,6 @@ void busInterruptHandler(){
   sequenceIndex = (sequenceIndex +1) % 18;
   
   if(sequenceIndex == 0){
-    printAbsoluteTimes();
-    printRelativeTimes();
-    printBusValues();
     printCommand();
 
     Serial.println();
@@ -109,11 +106,20 @@ void printBusValues(){
 }
 
 void printCommand(){
-  Serial.println("Command:");
-  for(uint8_t i = 2; i < 17; i++){
+  Serial.print("Device:  ");
+  for(uint8_t i = 2; i < 2+6; i++){
     uint32_t duration = sequenceTimes[i] - sequenceTimes[max(i-1, 0)];
     
     if(i > 2 && (i - 2) % 4 == 0) Serial.print(" ");
+    Serial.print(duration > 500);
+  }
+  Serial.println();
+  
+  Serial.print("Command: ");
+  for(uint8_t i = 8; i < 17; i++){
+    uint32_t duration = sequenceTimes[i] - sequenceTimes[max(i-1, 0)];
+    
+    if(i > 8 && i % 4 == 0) Serial.print(" ");
     Serial.print(duration > 500);
   }
   Serial.println();
