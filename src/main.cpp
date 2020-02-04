@@ -137,10 +137,10 @@ void printCommand(){
   Serial.println();
 }
 
-const uint8_t PREAMBLE_PULLDOWN_TICKS = 27;
+const uint8_t PREAMBLE_PULLDOWN_TICKS = 15;
 const uint8_t ONE_TICKS = 2;
 const uint8_t ZERO_TICKS = 1;
-const uint16_t POSTAMBLE_PULLDOWN_TICKS = 768;
+const uint16_t POSTAMBLE_PULLDOWN_TICKS = 15;
 const uint16_t COOLDOWN_TICKS = 5000;
 
 uint8_t currentCommandIndex = 0;

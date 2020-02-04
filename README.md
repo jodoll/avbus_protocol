@@ -38,7 +38,7 @@ Notes:
 The default state of the Bus signal is `HIGH`.
 
 The commands seem to have the following structure:
-* The bus is pulled to `LOW` for around 10.125 ms (`INIT`)
+* The bus is pulled to `LOW` for around 10.125 ms (5.626 ms seem to be enough) (`INIT`)
 * Then the command follows
   * Structure
     * 6 bit device address
@@ -46,7 +46,7 @@ The commands seem to have the following structure:
   * The values are determined by a delay before the next change of the bus value
     * 0 -> 0.375 ms 
     * 1 -> 0.750 ms
-* The bus is pulled to `LOW` again for some time between 100 ms and 200 ms (`HOLD`)
+* The bus is pulled to `LOW` again for some time between 100 ms and 200 ms (5.626 ms seem to be enough) (`HOLD`)
   * When the key on the remote control is held down the bus stays `LOW` until the key is released and the command is executed again by the device
 
 Notes: 
