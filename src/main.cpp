@@ -79,6 +79,7 @@ void busInterruptHandler(){
   
   if(sequenceIndex == 0){
     Serial.println("-> Received Message");
+    printRelativeTimes();
     printCommand();
     Serial.println();
     sequenceStarted = false;
@@ -190,7 +191,6 @@ void tick(){
   if(currentCommandIndex == 0){
     Serial.println("<- Sent message");
     Serial.println();
-    resetClock();
   }
   lastTime = sequenceDurationUs;
 }
