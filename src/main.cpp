@@ -2,7 +2,10 @@
 #include <DS3231.h>
 #include <Wire.h>
 
+#define SEND_MODE 1
+
 const uint8_t BUS_INTERRUPT_PIN = 3;
+const uint8_t BUS_SEND_PIN = 4;
 const uint8_t CLOCK_INTERRUPT_PIN = 2;
 
 const uint32_t COUNT_RATE_HZ = 8000;
@@ -16,6 +19,8 @@ void printAbsoluteTimes();
 void printRelativeTimes();
 void printBusValues();
 void printCommand();
+void translateCommand();
+void tick();
 
 DS3231 clock;
 
@@ -24,7 +29,10 @@ void setup(){
   Serial.println("Starting up...");
 
   Wire.begin();
-  pinMode(BUS_INTERRUPT_PIN, INPUT);
+  pinMode(BUS_SEND_PIN, OUTPUT);
+  digitalWrite(BUS_SEND_PIN, HIGH);
+  translateCommand();
+
   pinMode(CLOCK_INTERRUPT_PIN, INPUT_PULLUP);
   clock.enable32kHz(true);
   attachInterrupt(digitalPinToInterrupt(CLOCK_INTERRUPT_PIN), *clockInterruptHandler, RISING);
@@ -41,6 +49,9 @@ void clockInterruptHandler(){
   ticks = (ticks + 1) % (COUNT_ON_TICK);
   if (ticks == 0) {
     sequenceDurationUs += CLOCK_RESOLUTION_US;
+    #if SEND_MODE
+    tick();
+    #endif
   }
 }
 
@@ -67,8 +78,8 @@ void busInterruptHandler(){
   sequenceIndex = (sequenceIndex +1) % 18;
   
   if(sequenceIndex == 0){
+    Serial.println("-> Received Message");
     printCommand();
-
     Serial.println();
     sequenceStarted = false;
   }
@@ -95,9 +106,9 @@ void printRelativeTimes(){
 
 void printBusValues(){
   Serial.println("Bus Values:");
-  for(uint8_t i = 2; i < 17; i++){
-    uint32_t duration = sequenceTimes[i] - sequenceTimes[max(i-1, 0)];
-    for(uint16_t j = 0; j< min(duration/125, 10); j++){
+  for(uint8_t i = 0; i < 17; i++){
+    uint32_t duration = sequenceTimes[i+1] - sequenceTimes[i];
+    for(uint16_t j = 0; j< min(duration/250, 30); j++){
       Serial.print(busValues[i]);
     }
     Serial.print(" ");
@@ -123,4 +134,63 @@ void printCommand(){
     Serial.print(duration > 500);
   }
   Serial.println();
+}
+
+const uint8_t PREAMBLE_PULLDOWN_TICKS = 27;
+const uint8_t ONE_TICKS = 2;
+const uint8_t ZERO_TICKS = 1;
+const uint16_t POSTAMBLE_PULLDOWN_TICKS = 768;
+const uint16_t COOLDOWN_TICKS = 5000;
+
+uint8_t currentCommandIndex = 0;
+uint16_t command[18];
+uint16_t remainingPhaseDuration;
+bool nextValue = false;
+
+
+/* 
+Increase  volume
+Device:  0110 01
+Command: 0101 0101 1
+
+Tuning Up
+Device:  0101 10
+Command: 1010 1010 0
+*/
+void translateCommand(){
+  uint16_t rawCommand = 0b010110101010100;
+  command[0] = COOLDOWN_TICKS * 3;
+  command[1]= PREAMBLE_PULLDOWN_TICKS * 3;
+  for(int i = 0; i<15; i++){
+    command[i+2] = (((rawCommand >> (14-i)) & 0b1) + 1)*3;
+  }
+  command[17] = POSTAMBLE_PULLDOWN_TICKS * 3;
+  remainingPhaseDuration = command[currentCommandIndex];
+
+  Serial.print("Translated Command to: ");
+  for(uint8_t i = 0; i < 18; i++){
+    Serial.print(command[i]);
+    Serial.print(" ");
+  }
+  Serial.println();
+}
+
+uint32_t lastTime;
+void tick(){
+  if(currentCommandIndex >= 18) return;
+  if(--remainingPhaseDuration>0) return;
+  //Serial.print("Sending ");
+  //Serial.print(nextValue);
+  //Serial.print(" after ");
+  //Serial.println(sequenceDurationUs - lastTime);
+  digitalWrite(BUS_SEND_PIN, nextValue);
+  nextValue = !nextValue;
+  remainingPhaseDuration = command[(++currentCommandIndex)%18];
+  currentCommandIndex = currentCommandIndex%18;
+  if(currentCommandIndex == 0){
+    Serial.println("<- Sent message");
+    Serial.println();
+    resetClock();
+  }
+  lastTime = sequenceDurationUs;
 }
