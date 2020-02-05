@@ -1,16 +1,6 @@
 #include "AvBusWriter.hpp"
 #include "Timings.hpp"
 
-/*
-Increase  volume
-Device:  0110 01
-Command: 0101 0101 1
-
-Tuning Up
-Device:  0101 10
-Command: 1010 1010 0
-*/
-
 AvBusWriter::AvBusWriter(Clock &clock, uint8_t pin) : clock(clock), pin(pin) {}
 
 AvBusWriter::~AvBusWriter() { clock.registerTickCallback(nullptr); }
