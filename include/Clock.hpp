@@ -14,15 +14,17 @@ class Clock {
   void reset();
   uint32_t time();
   void tick();
+  void registerTickCallback(void (*onTick)());
 
- private:
   const uint32_t frequency;
-  const uint16_t countOnTick = CLOCK_SIGNAL_HZ / frequency;
   const uint16_t resolutionUs = 1000000 / frequency;
 
-  DS3231 clock;
+ private:
+  const uint16_t countOnTick = CLOCK_SIGNAL_HZ / frequency;
 
+  DS3231 clock;
   uint8_t pin;
+  void (*onTick)() = nullptr;
   uint32_t currentTime = 0;
   uint16_t ticks = 0;
 };

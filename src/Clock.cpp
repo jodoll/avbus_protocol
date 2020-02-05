@@ -12,12 +12,12 @@ void Clock::reset() {
 
 uint32_t Clock::time() { return currentTime; }
 
+void Clock::registerTickCallback(void (*onTick)()) { this->onTick = onTick; }
+
 void Clock::tick() {
   ticks = (ticks + 1) % (countOnTick);
   if (ticks == 0) {
     currentTime += resolutionUs;
-#if SEND_MODE
-    tick();
-#endif
+    if (onTick != nullptr) onTick();
   }
 }
