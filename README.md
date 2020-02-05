@@ -54,7 +54,7 @@ Notes:
 
 ## Todo
 - [ ] Check if the DS3231 signal is required
-- [ ] Record and protocol all signals
+- [x] Record and protocol all signals
 - [ ] Narrow down timings for INIT, 0, 1 and HOLD
 - [ ] What's threshold where HOLD makes a device repeat the command 
 - [ ] Allow sending of arbitrary commands
