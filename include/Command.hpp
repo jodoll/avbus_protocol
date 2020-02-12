@@ -75,7 +75,7 @@ enum Phono {
 
 enum Cd {  //
   PLAY_NEXT = Phono::PLAY,
-  STOP_C = Phono::CUT,
+  CD_STOP_C = Tape::STOP_C,
   CD_PAUSE = Tape::PAUSE,
   CD_REPEAT = Phono::REPEAT
 };
