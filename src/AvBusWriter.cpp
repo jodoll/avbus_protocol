@@ -1,7 +1,7 @@
 #include "AvBusWriter.hpp"
 #include "Timings.hpp"
 
-AvBusWriter::AvBusWriter(Clock &clock, uint8_t pin) : clock(clock), pin(pin) {}
+AvBusWriter::AvBusWriter(AvBusClock &clock, uint8_t pin) : clock(clock), pin(pin) {}
 
 AvBusWriter::~AvBusWriter() { clock.registerTickCallback(nullptr); }
 

@@ -47,7 +47,7 @@ void AvBusReader::printBusValues() {
   Serial.println("Bus Values:");
   for (uint8_t i = 0; i < 17; i++) {
     uint32_t duration = sequenceTimes[i + 1] - sequenceTimes[i];
-    for (uint16_t j = 0; j < min(duration / 250, 30); j++) {
+    for (uint16_t j = 0; j < min(duration / 250, (uint32_t) 30); j++) {
       Serial.print(busValues[i]);
     }
     Serial.print(" ");

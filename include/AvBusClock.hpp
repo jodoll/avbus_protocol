@@ -6,10 +6,10 @@
 
 constexpr uint32_t CLOCK_SIGNAL_HZ = 32768;
 
-class Clock {
+class AvBusClock {
  public:
-  Clock(const uint32_t frequency, const uint8_t pin) : frequency(frequency), pin(pin) {}
-  ~Clock() {}
+  AvBusClock(const uint32_t frequency, const uint8_t pin) : frequency(frequency), pin(pin) {}
+  ~AvBusClock() {}
   void init();
   void reset();
   uint32_t time();

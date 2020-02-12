@@ -1,17 +1,17 @@
 #ifndef READ_H
 #define READ_H
 
-#include "Clock.hpp"
+#include "AvBusClock.hpp"
 #include "inttypes.h"
 
 class AvBusReader {
  public:
-  AvBusReader(Clock &clock, uint8_t pin) : clock(clock), pin(pin) {}
+  AvBusReader(AvBusClock &clock, uint8_t pin) : clock(clock), pin(pin) {}
   ~AvBusReader() {}
   void onBusValueChanged();
 
  private:
-  Clock &clock;
+  AvBusClock &clock;
   const uint8_t pin;
 
   bool sequenceStarted = false;
