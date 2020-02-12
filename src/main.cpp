@@ -13,7 +13,7 @@ constexpr uint8_t BUS_INTERRUPT_PIN = 3;
 constexpr uint8_t BUS_SEND_PIN = 4;
 constexpr uint8_t CLOCK_INTERRUPT_PIN = 2;
 #elif defined(ESP32)
-constexpr uint8_t BUS_INTERRUPT_PIN = 2;
+constexpr uint8_t BUS_INTERRUPT_PIN = 34;
 constexpr uint8_t BUS_SEND_PIN = 39;
 constexpr uint8_t CLOCK_INTERRUPT_PIN = 15;
 #endif
