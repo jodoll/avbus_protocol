@@ -53,13 +53,21 @@ Notes:
 * The timings may be off a good deal due to the sampling rate of 8kHz. This also leads to some alias.
 
 ## Todo
-- [ ] Check if the DS3231 signal is required
+### Protocol
 - [x] Record and protocol all signals
 - [ ] Narrow down timings for INIT, 0, 1 and HOLD
 - [ ] What's threshold where HOLD makes a device repeat the command 
-- [ ] Allow sending of arbitrary commands
+
+### Circuit
+- [ ] Check if the DS3231 signal is required
 - [ ] Do not block the bus to allow for side by side operation with RMC-20AV
+
+### Documentation
 - [ ] Add diagram of wiring
 - [ ] Add diagram of the bus signals
-- [x] ESP32 port to support a webserver/bt (probably separate project, will be linked here)
+
+### Features
+- [ ] Allow sending of arbitrary commands
+- [x] ESP32 port to support a webserver/bt
+- [ ] Add a Webserver on ESP32
 - [ ] Android app to act as a remote control (probably separate project, will be linked here)
