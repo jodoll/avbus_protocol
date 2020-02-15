@@ -61,5 +61,5 @@ Notes:
 - [ ] Do not block the bus to allow for side by side operation with RMC-20AV
 - [ ] Add diagram of wiring
 - [ ] Add diagram of the bus signals
-- [ ] ESP32 port to support a webserver/bt (probably separate project, will be linked here)
+- [x] ESP32 port to support a webserver/bt (probably separate project, will be linked here)
 - [ ] Android app to act as a remote control (probably separate project, will be linked here)
