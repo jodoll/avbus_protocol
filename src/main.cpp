@@ -40,7 +40,7 @@ void setup() {
   pinMode(BUS_SEND_PIN, OUTPUT);
   // Tune up
   writer.loadCommand(0b010110101010100);
-  // clock.registerTickCallback(&onClockTick);
+  avBusClock.registerTickCallback(&onClockTick);
 
   attachInterrupt(digitalPinToInterrupt(BUS_INTERRUPT_PIN), &busInterruptHandler, CHANGE);
   attachInterrupt(digitalPinToInterrupt(CLOCK_INTERRUPT_PIN), &clockInterruptHandler, RISING);
