@@ -3,9 +3,10 @@
 #include "AvBusClock.hpp"
 #include "AvBusReader.hpp"
 #include "AvBusWriter.hpp"
+#include "project.hpp"
 
-#if !defined(UNO) && !defined(ESP32)
-#define UNO
+#if defined(WEBSERVER)
+#include "AvWebserver.hpp"
 #endif
 
 #if defined(UNO)
@@ -27,10 +28,27 @@ void onClockTick();
 AvBusClock avBusClock(CLOCK_FREQUENCY_HZ, CLOCK_INTERRUPT_PIN);
 AvBusReader reader(avBusClock, BUS_INTERRUPT_PIN);
 AvBusWriter writer(avBusClock, BUS_SEND_PIN);
+#if defined(WEBSERVER)
+AvWebserver webserver;
+#endif
 
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting up...");
+
+#if defined(WEBSERVER)
+  Serial.print("Connecting to WiFi");
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println();
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+
+  webserver.start();
+#endif
 
   Wire.begin();
   avBusClock.init();
@@ -47,12 +65,13 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+#if defined(WEBSERVER)
+  webserver.handleConnections();
+#endif
 }
 
 void clockInterruptHandler() { avBusClock.tick(); }
 
-void busInterruptHandler() { 
-  reader.onBusValueChanged(); }
+void busInterruptHandler() { reader.onBusValueChanged(); }
 
 void onClockTick() { writer.onClockTick(); }
