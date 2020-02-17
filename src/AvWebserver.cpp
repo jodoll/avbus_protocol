@@ -1,4 +1,5 @@
 #include "AvWebserver.hpp"
+#include "Command.hpp"
 
 AvWebserver::AvWebserver() : server(80, authProvider) {}
 AvWebserver::~AvWebserver() {}
@@ -39,7 +40,15 @@ void AvWebserver::onPostCommand(RequestContext request) {
     request.response.json["error"] = F("Invalid JSON.  Missing or invalid value for 'device'");
     return;
   }
-  std::string device = body[KEY_DEVICE];
+  std::string deviceName = body[KEY_DEVICE];
+  const Device* device = Device::getDeviceByName(deviceName);
+  Serial.print("Device name: ");
+  Serial.println(device->getDeviceName().c_str());
+  if (device == nullptr) {
+    request.response.setCode(400);
+    request.response.json["error"] = F("Invalid 'device'");
+    return;
+  }
 
   const char* KEY_COMMAND = "command";
   if (!body.containsKey(KEY_COMMAND) || !body[KEY_COMMAND].is<std::string>()) {
@@ -47,12 +56,22 @@ void AvWebserver::onPostCommand(RequestContext request) {
     request.response.json["error"] = F("Invalid JSON.  Missing or invalid value for 'command'");
     return;
   }
-  std::string command = body[KEY_COMMAND];
+  std::string commandName = body[KEY_COMMAND];
+  uint16_t command = (*device)[commandName];
+  if (command == Device::Command::UNDEFINED) {
+    request.response.setCode(400);
+    request.response.json["error"] = F("Invalid Command/Device combination.");
+    return;
+  }
 
-  Serial.print("Device: ");
-  Serial.println(device.c_str());
+  Command combinedCommand((*device), command);
+  std::vector<uint16_t> timings = combinedCommand.getTimings();
   Serial.print("Command: ");
-  Serial.println(command.c_str());
+  for (int i = 0; i < timings.size(); i++) {
+    Serial.print(timings[i]);
+    Serial.print(" ");
+  }
+  Serial.println();
 
   request.response.setCode(200);
   request.response.json["success"] = true;
