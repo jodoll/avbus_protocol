@@ -1,32 +1,22 @@
-#ifndef CLOCK_H
-#define CLOCK_H
+#ifndef AV_BUS_CLOCK_H
+#define AV_BUS_CLOCK_H
 
 #include <Arduino.h>
-#include <DS3231.h>
-
-constexpr uint32_t CLOCK_SIGNAL_HZ = 32768;
+#include <inttypes.h>
 
 class AvBusClock {
  public:
-  AvBusClock(const uint32_t frequency, const uint8_t pin) : frequency(frequency), pin(pin) {}
-  ~AvBusClock() {}
-  void init();
-  void reset();
-  uint32_t time();
-  void tick();
+  virtual void init(void (*clockInterruptHandler)());
+  virtual void reset();
+  virtual void tick();
+
   void registerTickCallback(void (*onTick)());
 
-  const uint32_t frequency;
-  const uint16_t resolutionUs = 1000000 / frequency;
+  virtual uint32_t time() const;
+  virtual uint16_t getResolutionUs() const;
 
- private:
-  const uint16_t countOnTick = CLOCK_SIGNAL_HZ / frequency;
-
-  DS3231 clock;
-  uint8_t pin;
+ protected:
   void (*onTick)() = nullptr;
-  uint32_t currentTime = 0;
-  uint16_t ticks = 0;
 };
 
-#endif  // CLOCK_H
+#endif  // AV_BUS_CLOCK_H

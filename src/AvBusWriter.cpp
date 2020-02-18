@@ -44,7 +44,7 @@ void AvBusWriter::loadNextCommand() {
     commandTimings = command.getTimings();
     loadedCommand = commandTimings.data();
     commandIndex = 0;
-    remainingTicksCurrentPhase = loadedCommand[0] / clock->resolutionUs;
+    remainingTicksCurrentPhase = loadedCommand[0] / clock->getResolutionUs();
   }
 #endif
 }
@@ -78,7 +78,7 @@ void AvBusWriter::onClockTick() {
 
   // Read next delay
   commandIndex++;
-  remainingTicksCurrentPhase = loadedCommand[commandIndex % COMMAND_LENGTH] / clock->resolutionUs;
+  remainingTicksCurrentPhase = loadedCommand[commandIndex % COMMAND_LENGTH] / clock->getResolutionUs();
   // Send command again if finished
   commandIndex = commandIndex % COMMAND_LENGTH;
   // Log completion of command
@@ -86,6 +86,6 @@ void AvBusWriter::onClockTick() {
     printCommand(loadedCommand);
     Serial.println("<- Sent message");
     loadedCommand = nullptr;
-    remainingTicksCurrentPhase = COOLDOWN_DELAY_US / clock->resolutionUs;
+    remainingTicksCurrentPhase = COOLDOWN_DELAY_US / clock->getResolutionUs();
   }
 }
