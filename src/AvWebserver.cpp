@@ -1,7 +1,7 @@
 #include "AvWebserver.hpp"
 #include "Command.hpp"
 
-AvWebserver::AvWebserver() : server(80, authProvider) {}
+AvWebserver::AvWebserver(AvBusWriter* writer) : server(80, authProvider), writer(writer) {}
 AvWebserver::~AvWebserver() {}
 
 void AvWebserver::start() {
@@ -64,14 +64,9 @@ void AvWebserver::onPostCommand(RequestContext request) {
     return;
   }
 
+  Serial.println("Queueing command");
   Command combinedCommand((*device), command);
-  std::vector<uint16_t> timings = combinedCommand.getTimings();
-  Serial.print("Command: ");
-  for (int i = 0; i < timings.size(); i++) {
-    Serial.print(timings[i]);
-    Serial.print(" ");
-  }
-  Serial.println();
+  writer->queueCommand(combinedCommand);
 
   request.response.setCode(200);
   request.response.json["success"] = true;

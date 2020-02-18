@@ -4,6 +4,7 @@
 
 #if defined(ESP32)
 #define WEBSERVER
+#define STDLIB
 #endif
 
 #ifndef WIFI_SSID

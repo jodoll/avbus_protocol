@@ -54,7 +54,7 @@ class Tuner : public Device {
     MEMORY_7 = 0b100110101,
     MEMORY_8 = 0b101001010
   };
-
+  
   const std::string getDeviceName() const override { return "Tuner"; }
   const Device::Code getDeviceCode() const override { return Device::TUNER; }
   const std::map<std::string, uint16_t> getCommandMap() const override { return commandByName; }

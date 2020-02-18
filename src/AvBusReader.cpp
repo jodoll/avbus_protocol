@@ -7,11 +7,11 @@ void AvBusReader::onBusValueChanged() {
   if (!sequenceStarted && isHigh) {
     return;
   } else if (!sequenceStarted) {
-    clock.reset();
+    clock->reset();
     sequenceStarted = true;
   }
 
-  sequenceTimes[sequenceIndex] = clock.time();
+  sequenceTimes[sequenceIndex] = clock->time();
   busValues[sequenceIndex] = isHigh;
   sequenceIndex = (sequenceIndex + 1) % 18;
 

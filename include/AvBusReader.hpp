@@ -6,12 +6,12 @@
 
 class AvBusReader {
  public:
-  AvBusReader(AvBusClock &clock, uint8_t pin) : clock(clock), pin(pin) {}
+  AvBusReader(AvBusClock* clock, uint8_t pin) : clock(clock), pin(pin) {}
   ~AvBusReader() {}
   void onBusValueChanged();
 
  private:
-  AvBusClock &clock;
+  AvBusClock* clock;
   const uint8_t pin;
 
   bool sequenceStarted = false;

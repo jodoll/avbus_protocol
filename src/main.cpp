@@ -26,10 +26,10 @@ void busInterruptHandler();
 void onClockTick();
 
 AvBusClock avBusClock(CLOCK_FREQUENCY_HZ, CLOCK_INTERRUPT_PIN);
-AvBusReader reader(avBusClock, BUS_INTERRUPT_PIN);
-AvBusWriter writer(avBusClock, BUS_SEND_PIN);
+AvBusReader reader(&avBusClock, BUS_INTERRUPT_PIN);
+AvBusWriter writer(&avBusClock, BUS_SEND_PIN);
 #if defined(WEBSERVER)
-AvWebserver webserver;
+AvWebserver webserver(&writer);
 #endif
 
 void setup() {
@@ -57,7 +57,6 @@ void setup() {
   pinMode(CLOCK_INTERRUPT_PIN, INPUT_PULLUP);
   pinMode(BUS_SEND_PIN, OUTPUT);
   // Tune up
-  writer.loadCommand(0b010110101010100);
   avBusClock.registerTickCallback(&onClockTick);
 
   attachInterrupt(digitalPinToInterrupt(BUS_INTERRUPT_PIN), &busInterruptHandler, CHANGE);
@@ -67,6 +66,10 @@ void setup() {
 void loop() {
 #if defined(WEBSERVER)
   webserver.handleConnections();
+#endif
+#if !defined(STDLIB)
+  writer.setCommand(0b010110101010100);
+  delay(1000)
 #endif
 }
 
