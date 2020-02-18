@@ -59,10 +59,8 @@ void AvBusWriter::printCommand(uint16_t *commandArray) {
 
 void AvBusWriter::onClockTick() {
   // Decrease time, if some is left
-  if (remainingTicksCurrentPhase > 0) {
-    remainingTicksCurrentPhase--;
-    return;
-  }
+  remainingTicksCurrentPhase = max(remainingTicksCurrentPhase - 1, 0);
+  if (remainingTicksCurrentPhase > 0) return;
 
   // Try to load next command
   if (loadedCommand == nullptr) {
