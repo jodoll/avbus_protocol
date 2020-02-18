@@ -73,7 +73,7 @@ void AvBusWriter::onClockTick() {
   }
 
   // Write next value
-  bool nextBusValue = commandIndex % 2;
+  bool nextBusValue = (commandIndex + 1) % 2;
   digitalWrite(pin, nextBusValue);
 
   // Read next delay
