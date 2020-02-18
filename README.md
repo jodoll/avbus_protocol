@@ -59,15 +59,16 @@ Notes:
 - [ ] What's the threshold where HOLD makes a device repeat the command 
 
 ### Circuit
-- [ ] Check if the DS3231 signal is required
+- [x] Check if the DS3231 signal is required (at least not for ESP32)
 - [ ] Do not block the bus to allow for side by side operation with RMC-20AV
 
 ### Documentation
 - [ ] Add diagram of wiring
 - [ ] Add diagram of the bus signals
+- [ ] Add REST api documentation
 
 ### Features
-- [ ] Allow sending of arbitrary commands
+- [x] Allow sending of arbitrary commands
 - [x] ESP32 port to support a webserver/bt
-- [ ] Add a Webserver on ESP32
+- [x] Add a Webserver on ESP32
 - [ ] Android app to act as a remote control (probably separate project, will be linked here)
