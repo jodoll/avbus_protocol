@@ -40,8 +40,6 @@ void AvWebserver::onPostCommand(RequestContext request) {
   }
   std::string deviceName = body[KEY_DEVICE];
   const Device* device = Device::getDeviceByName(deviceName);
-  Serial.print("Device name: ");
-  Serial.println(device->getDeviceName().c_str());
   if (device == nullptr) {
     request.response.setCode(400);
     request.response.json["error"] = F("Invalid 'device'");
@@ -62,7 +60,6 @@ void AvWebserver::onPostCommand(RequestContext request) {
     return;
   }
 
-  Serial.println("Queueing command");
   Command combinedCommand((*device), command);
   writer->queueCommand(combinedCommand);
 

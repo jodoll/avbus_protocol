@@ -9,3 +9,5 @@
 #ifndef WIFI_PASSWORD
 #define WIFI_PASSWORD "password"
 #endif
+
+#define VERBOSE 0

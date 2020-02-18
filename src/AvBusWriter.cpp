@@ -1,5 +1,6 @@
 #include "AvBusWriter.hpp"
 #include "Timings.hpp"
+#include "project.hpp"
 
 AvBusWriter::AvBusWriter(AvBusClock *clock, uint8_t pin) : clock(clock), pin(pin) {}
 
@@ -31,14 +32,14 @@ void AvBusWriter::setCommand(const uint16_t command) {
   commandIndex = 0;
   remainingTicksCurrentPhase = loadedCommand[0];
 
-  printCommand(loadedCommand);
+  if (VERBOSE) printCommand(loadedCommand);
 }
 #endif
 
 void AvBusWriter::loadNextCommand() {
 #ifdef ESP32
   if (!commandQueue.empty()) {
-    Serial.println("Loading new command");
+    if (VERBOSE) Serial.println("Loading new command");
     Command command = commandQueue.front();
     commandQueue.erase(commandQueue.begin());
     commandTimings = command.getTimings();
@@ -55,6 +56,7 @@ void AvBusWriter::printCommand(uint16_t *commandArray) {
     Serial.print(commandArray[i]);
     Serial.print(" ");
   }
+  Serial.println();
 }
 
 void AvBusWriter::onClockTick() {
@@ -83,8 +85,10 @@ void AvBusWriter::onClockTick() {
   commandIndex = commandIndex % COMMAND_LENGTH;
   // Log completion of command
   if (commandIndex == 0) {
-    printCommand(loadedCommand);
-    Serial.println("<- Sent message");
+    if (VERBOSE) {
+      Serial.println("<- Sent message");
+      printCommand(loadedCommand);
+    }
     loadedCommand = nullptr;
     remainingTicksCurrentPhase = COOLDOWN_DELAY_US / clock->getResolutionUs();
   }
