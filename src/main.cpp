@@ -30,6 +30,7 @@ AvBusReader reader(&avBusClock, BUS_INTERRUPT_PIN);
 AvBusWriter writer(&avBusClock, BUS_SEND_PIN);
 #if defined(ESP32)
 AvWebserver webserver(&writer);
+hw_timer_t* timer = NULL;
 #endif
 
 void setup() {
@@ -48,11 +49,15 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   webserver.start();
-#endif
 
+  timer = timerBegin(0, 80, true);
+  timerAttachInterrupt(timer, &onClockTick, true);
+  timerAlarmWrite(timer, 125, true);
+  timerAlarmEnable(timer);
+#else
   Wire.begin();
   avBusClock.init();
-
+#endif
   pinMode(BUS_INTERRUPT_PIN, INPUT_PULLUP);
   pinMode(CLOCK_INTERRUPT_PIN, INPUT_PULLUP);
   pinMode(BUS_SEND_PIN, OUTPUT);
@@ -60,7 +65,7 @@ void setup() {
   avBusClock.registerTickCallback(&onClockTick);
 
   attachInterrupt(digitalPinToInterrupt(BUS_INTERRUPT_PIN), &busInterruptHandler, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(CLOCK_INTERRUPT_PIN), &clockInterruptHandler, RISING);
+  //attachInterrupt(digitalPinToInterrupt(CLOCK_INTERRUPT_PIN), &clockInterruptHandler, RISING);
 }
 
 void loop() {
