@@ -14,18 +14,18 @@ constexpr uint32_t COOLDOWN_DELAY_US = 20000;
 
 class AvBusWriter {
  public:
-  AvBusWriter(AvBusClock* clock, uint8_t pin);
+  AvBusWriter(AvBusClock *clock, uint8_t pin);
   ~AvBusWriter();
-  void setCommand(const uint16_t command);
 #ifdef STDLIB
-  void queueCommand(const Command command);
+  void queueCommand(const Command &command);
+#else
+  void setCommand(const uint16_t command);
 #endif
   void onClockTick();
 
  private:
-  AvBusClock* clock;
+  AvBusClock *clock;
   uint8_t pin;
-  uint16_t defaultCommand[COMMAND_LENGTH];
   uint16_t *loadedCommand = nullptr;
 
   uint8_t commandIndex;
@@ -33,6 +33,9 @@ class AvBusWriter {
 
 #ifdef STDLIB
   std::vector<Command> commandQueue;
+  std::vector<uint16_t> commandTimings;
+#else
+  uint16_t commandTimings[COMMAND_LENGTH];
 #endif
 
   void loadNextCommand();

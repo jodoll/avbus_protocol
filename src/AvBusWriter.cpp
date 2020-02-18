@@ -1,12 +1,15 @@
 #include "AvBusWriter.hpp"
 #include "Timings.hpp"
 
-AvBusWriter::AvBusWriter(AvBusClock* clock, uint8_t pin) : clock(clock), pin(pin) {}
+AvBusWriter::AvBusWriter(AvBusClock *clock, uint8_t pin) : clock(clock), pin(pin) {}
 
 AvBusWriter::~AvBusWriter() { clock->registerTickCallback(nullptr); }
 
+#ifdef STDLIB
+void AvBusWriter::queueCommand(const Command &command) { commandQueue.push_back(command); }
+#else
 void AvBusWriter::setCommand(const uint16_t command) {
-  loadedCommand = defaultCommand;
+  loadedCommand = commandTimings;
   // Delay between commands
   loadedCommand[0] = COOLDOWN_DELAY_US;
   // INIT
@@ -30,9 +33,6 @@ void AvBusWriter::setCommand(const uint16_t command) {
 
   printCommand(loadedCommand);
 }
-
-#ifdef STDLIB
-void AvBusWriter::queueCommand(const Command command) {commandQueue.push_back(command);}
 #endif
 
 void AvBusWriter::loadNextCommand() {
@@ -41,9 +41,8 @@ void AvBusWriter::loadNextCommand() {
     Serial.println("Loading new command");
     Command command = commandQueue.front();
     commandQueue.erase(commandQueue.begin());
-    std::vector<uint16_t> timings = command.getTimings();
-    memccpy(defaultCommand, timings.data(), 0, timings.size() * sizeof(uint16_t));
-    loadedCommand = defaultCommand;
+    commandTimings = command.getTimings();
+    loadedCommand = commandTimings.data();
     commandIndex = 0;
     remainingTicksCurrentPhase = loadedCommand[0] / clock->resolutionUs;
   }
