@@ -5,7 +5,7 @@ AvBusWriter::AvBusWriter(AvBusClock *clock, uint8_t pin) : clock(clock), pin(pin
 
 AvBusWriter::~AvBusWriter() { clock->registerTickCallback(nullptr); }
 
-#ifdef STDLIB
+#ifdef ESP32
 void AvBusWriter::queueCommand(const Command &command) { commandQueue.push_back(command); }
 #else
 void AvBusWriter::setCommand(const uint16_t command) {
@@ -36,7 +36,7 @@ void AvBusWriter::setCommand(const uint16_t command) {
 #endif
 
 void AvBusWriter::loadNextCommand() {
-#ifdef STDLIB
+#ifdef ESP32
   if (!commandQueue.empty()) {
     Serial.println("Loading new command");
     Command command = commandQueue.front();

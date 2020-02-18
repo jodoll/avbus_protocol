@@ -1,5 +1,5 @@
-#include "AvWebserver.hpp"
-#include "Command.hpp"
+#include "esp/AvWebserver.hpp"
+#include "esp/Command.hpp"
 
 AvWebserver::AvWebserver(AvBusWriter* writer) : server(80, authProvider), writer(writer) {}
 AvWebserver::~AvWebserver() {}

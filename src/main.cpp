@@ -5,8 +5,8 @@
 #include "AvBusWriter.hpp"
 #include "project.hpp"
 
-#if defined(WEBSERVER)
-#include "AvWebserver.hpp"
+#if defined(ESP32)
+#include "esp/AvWebserver.hpp"
 #endif
 
 #if defined(UNO)
@@ -28,7 +28,7 @@ void onClockTick();
 AvBusClock avBusClock(CLOCK_FREQUENCY_HZ, CLOCK_INTERRUPT_PIN);
 AvBusReader reader(&avBusClock, BUS_INTERRUPT_PIN);
 AvBusWriter writer(&avBusClock, BUS_SEND_PIN);
-#if defined(WEBSERVER)
+#if defined(ESP32)
 AvWebserver webserver(&writer);
 #endif
 
@@ -36,7 +36,7 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Starting up...");
 
-#if defined(WEBSERVER)
+#if defined(ESP32)
   Serial.print("Connecting to WiFi");
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
@@ -64,7 +64,7 @@ void setup() {
 }
 
 void loop() {
-#if !defined(STDLIB)
+#if defined(UNO)
   writer.setCommand(0b010110101010100);
   delay(1000);
 #endif

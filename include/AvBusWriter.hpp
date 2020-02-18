@@ -5,8 +5,8 @@
 #include "inttypes.h"
 #include "project.hpp"
 
-#ifdef STDLIB
-#include "Command.hpp"
+#ifdef ESP32
+#include "esp/Command.hpp"
 #endif
 
 constexpr uint8_t COMMAND_LENGTH = 17;
@@ -16,7 +16,7 @@ class AvBusWriter {
  public:
   AvBusWriter(AvBusClock *clock, uint8_t pin);
   ~AvBusWriter();
-#ifdef STDLIB
+#ifdef ESP32
   void queueCommand(const Command &command);
 #else
   void setCommand(const uint16_t command);
@@ -31,7 +31,7 @@ class AvBusWriter {
   uint8_t commandIndex;
   uint16_t remainingTicksCurrentPhase;
 
-#ifdef STDLIB
+#ifdef ESP32
   std::vector<Command> commandQueue;
   std::vector<uint16_t> commandTimings;
 #else

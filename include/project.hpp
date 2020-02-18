@@ -2,11 +2,6 @@
 #define ESP32
 #endif
 
-#if defined(ESP32)
-#define WEBSERVER
-#define STDLIB
-#endif
-
 #ifndef WIFI_SSID
 #define WIFI_SSID "ssid"
 #endif
