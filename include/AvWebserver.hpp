@@ -5,7 +5,7 @@
 #include <WiFi.h>
 #include "AvBusWriter.hpp"
 
-using RichHttpConfig = RichHttp::Generics::Configs::EspressifBuiltin;
+using RichHttpConfig = RichHttp::Generics::Configs::AsyncWebServer;
 using RequestContext = RichHttpConfig::RequestContextType;
 
 class AvWebserver {
@@ -14,7 +14,6 @@ class AvWebserver {
   ~AvWebserver();
 
   void start();
-  void handleConnections();
 
  private:
   SimpleAuthProvider authProvider;

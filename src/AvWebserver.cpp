@@ -16,8 +16,6 @@ void AvWebserver::start() {
   server.begin();
 }
 
-void AvWebserver::handleConnections() { server.handleClient(); }
-
 void AvWebserver::onGetRoot(RequestContext request) {
   const char* buffer = "Hello World";
 

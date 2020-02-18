@@ -64,9 +64,6 @@ void setup() {
 }
 
 void loop() {
-#if defined(WEBSERVER)
-  webserver.handleConnections();
-#endif
 #if !defined(STDLIB)
   writer.setCommand(0b010110101010100);
   delay(1000);
