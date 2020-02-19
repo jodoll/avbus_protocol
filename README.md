@@ -38,8 +38,12 @@ Breadboard and PCB design were created with [Fritzing](https://fritzing.org/).
 The Fritzing source file can be found in [circuit](circuit/).
 
 #### ESP32
-![ESP32 Breadboard](img/breadboard.svg)  
-![ESP32 PCB](img/pcb.svg)  
+**PCB**  
+![ESP32 PCB](img/pcb.svg)
+
+**Breadboard**  
+![ESP32 Breadboard](img/breadboard.svg)
+
 [AvBus_Esp32.fzz](circuit/AvBus_Esp32.fzz)
 
 ## Protocol
