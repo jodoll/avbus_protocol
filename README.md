@@ -33,6 +33,15 @@ Notes:
 * There seems to be no difference between the IN and OUT jack
 * Writing to the bus while reading seems possible, but the input from the RMC-20AV seems to be blocked (See [Todo](#Todo))
 
+### Circuit
+Breadboard and PCB design were created with [Fritzing](https://fritzing.org/).  
+The Fritzing source file can be found in [circuit](circuit/).
+
+#### ESP32
+![ESP32 Breadboard](img/breadboard.svg)  
+![ESP32 PCB](img/pcb.svg)  
+[AvBus_Esp32.fzz](circuit/AvBus_Esp32.fzz)
+
 ## Protocol
 
 The default state of the Bus signal is `HIGH`.
@@ -63,7 +72,7 @@ Notes:
 - [ ] Do not block the bus to allow for side by side operation with RMC-20AV
 
 ### Documentation
-- [ ] Add diagram of wiring
+- [x] Add diagram of wiring
 - [ ] Add diagram of the bus signals
 - [ ] Add REST api documentation
 
