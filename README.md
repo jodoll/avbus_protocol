@@ -39,10 +39,10 @@ The Fritzing source file can be found in [circuit](circuit/).
 
 #### ESP32
 **PCB**  
-![ESP32 PCB](img/pcb.svg)
+![ESP32 PCB](img/pcb_esp32.png)
 
 **Breadboard**  
-![ESP32 Breadboard](img/breadboard.svg)
+![ESP32 Breadboard](img/breadboard_esp32.png)
 
 [AvBus_Esp32.fzz](circuit/AvBus_Esp32.fzz)
 
