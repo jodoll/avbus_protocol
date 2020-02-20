@@ -84,4 +84,4 @@ Notes:
 - [x] Allow sending of arbitrary commands
 - [x] ESP32 port to support a webserver/bt
 - [x] Add a Webserver on ESP32
-- [ ] Android app to act as a remote control (probably separate project, will be linked here)
+- [ ] Android app to act as a remote control (check the status of the project [here](https://github.com/jodoll/avbus_android/))
