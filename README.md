@@ -65,6 +65,21 @@ The commands seem to have the following structure:
 Notes: 
 * The timings may be off a good deal due to the sampling rate of 8kHz. This also leads to some alias.
 
+## Third Party Software
+
+* [ArduinoJson](https://github.com/bblanchon/ArduinoJson) ([MIT](https://github.com/bblanchon/ArduinoJson/blob/6.x/LICENSE.md))
+* [Arduino Core Avr](https://github.com/arduino/ArduinoCore-avr)
+* [Arduino Core Esp32](https://github.com/espressif/arduino-esp32) ([LGPL v2.1](https://github.com/espressif/arduino-esp32/blob/master/LICENSE.md))
+* [DS3231](https://github.com/jarzebski/Arduino-DS3231) ([GPL v3](https://github.com/jarzebski/Arduino-DS3231/blob/master/LICENSE))
+* [ESP Async WebServer](https://github.com/me-no-dev/ESPAsyncWebServer) (LGPL v3)
+* [FS](https://github.com/espressif/arduino-esp32/blob/master/libraries/FS/src/FS.h) (LGPL v2.1)
+* [PathVariableHandlers](https://github.com/sidoh/path_variable_handlers) ([MIT](https://github.com/sidoh/path_variable_handlers/blob/master/LICENSE))
+* [RichHttpServer](https://github.com/sidoh/rich_http_server) ([MIT](https://github.com/sidoh/rich_http_server/blob/master/LICENSE))
+* [Update](https://github.com/espressif/arduino-esp32) ([LGPL v2.1](https://github.com/espressif/arduino-esp32/blob/master/LICENSE.md))
+* [WebServer]() ([LGPL v2.1](https://github.com/espressif/arduino-esp32/blob/master/LICENSE.md))
+* [WiFi](http://www.arduino.cc/en/Reference/WiFi) (LGPL v2.1
+* [Wire](http://arduino.cc/en/Reference/Wire) (LGPL v2.1)
+
 ## Todo
 ### Protocol
 - [x] Record and protocol all signals
