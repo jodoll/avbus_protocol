@@ -47,6 +47,7 @@ void setup() {
 
 #if defined(ESP32)
   Serial.print("Connecting to WiFi");
+  WiFi.setHostname("avbus"); //TODO: Move this to a build flag
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
