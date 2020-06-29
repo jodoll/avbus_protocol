@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
+#include <WiFi.h>
 #include "AvBusReader.hpp"
 #include "AvBusWriter.hpp"
 #include "project.hpp"
