@@ -12,6 +12,14 @@
 #include "uno/UnoAvBusClock.hpp"
 #endif
 
+#if defined(ESP32)
+#if CONFIG_FREERTOS_UNICORE
+#define ARDUINO_RUNNING_CORE 0
+#else
+#define ARDUINO_RUNNING_CORE 1
+#endif
+#endif
+
 #if defined(UNO)
 constexpr uint8_t BUS_INTERRUPT_PIN = 3;
 constexpr uint8_t BUS_SEND_PIN = 4;
@@ -27,6 +35,7 @@ constexpr uint32_t CLOCK_FREQUENCY_HZ = 8000;
 void clockInterruptHandler();
 void busInterruptHandler();
 void onClockTick();
+void serverTask(void* params);
 
 #if defined(ESP32)
 EspAvBusClock avBusClock(CLOCK_FREQUENCY_HZ);
@@ -37,16 +46,13 @@ UnoAvBusClock avBusClock(CLOCK_FREQUENCY_HZ, CLOCK_INTERRUPT_PIN);
 AvBusReader reader(&avBusClock, BUS_INTERRUPT_PIN);
 AvBusWriter writer(&avBusClock, BUS_SEND_PIN);
 
-#if defined(ESP32)
-AvWebserver webserver(&writer);
-#endif
-
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting up...");
 
 #if defined(ESP32)
-  Serial.print("Connecting to WiFi");
+  Serial.print("Connecting to: ");
+  Serial.print(WIFI_SSID);
   WiFi.setHostname("avbus"); //TODO: Move this to a build flag
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
@@ -57,7 +63,8 @@ void setup() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  webserver.start();
+  AvWebserver::setup(&writer);
+  xTaskCreatePinnedToCore(serverTask, "https443", 6144, NULL, 1, NULL, ARDUINO_RUNNING_CORE);
 #endif
 
   pinMode(BUS_INTERRUPT_PIN, INPUT_PULLUP);
@@ -82,3 +89,10 @@ void clockInterruptHandler() { avBusClock.tick(); }
 void busInterruptHandler() { reader.onBusValueChanged(); }
 
 void onClockTick() { writer.onClockTick(); }
+
+#if defined(ESP32)
+void serverTask(void* params) {
+  AvWebserver::run();
+  AvWebserver::tearDown();
+}
+#endif

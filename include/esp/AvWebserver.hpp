@@ -1,27 +1,46 @@
 #ifndef AV_WEBSERVER_H
 #define AV_WEBSERVER_H
 
-#include <RichHttpServer.h>
-#include <WiFi.h>
+#include <HTTPSServer.hpp>
+#include <HTTPRequest.hpp>
+#include <HTTPResponse.hpp>
+#include <SSLCert.hpp>
 #include "AvBusWriter.hpp"
 
-using RichHttpConfig = RichHttp::Generics::Configs::AsyncWebServer;
-using RequestContext = RichHttpConfig::RequestContextType;
+using namespace httpsserver;
+
+class HttpHeader{
+  public:
+    static constexpr const char* CONTENT_TYPE = "Content-Type"; 
+};
+
+class ContentType {
+  public:
+    static constexpr const char* APPLICATION_JSON = "application/json"; 
+};
 
 class AvWebserver {
  public:
+ 
+  static void setup(AvBusWriter* writer);
+  static void run();
+  static void tearDown();
+
+ private:
+  static AvWebserver* instance;
+  static bool isRunning;
+  static void onNotFound(HTTPRequest* request, HTTPResponse * response);
+  static void onGetRoot(HTTPRequest* request, HTTPResponse* response);
+  static void onPostCommand(HTTPRequest* request, HTTPResponse* response);
+
   AvWebserver(AvBusWriter* writer);
   ~AvWebserver();
 
-  void start();
+  void loop();
 
- private:
-  SimpleAuthProvider authProvider;
-  RichHttpServer<RichHttpConfig> server;
+  SSLCert* certificate;
+  HTTPSServer* server;
   AvBusWriter* writer;
-
-  void onGetRoot(RequestContext request);
-  void onPostCommand(RequestContext request);
 };
 
 #endif  // AV_WEBSERVER_H
