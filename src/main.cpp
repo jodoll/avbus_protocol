@@ -64,7 +64,11 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   AvWebserver::setup(&writer);
-  xTaskCreatePinnedToCore(serverTask, "https443", 6144, NULL, 1, NULL, ARDUINO_RUNNING_CORE);
+  int mainCore = xPortGetCoreID();
+  Serial.printf("Main loop is running on core %d\n", mainCore);
+  int webServerCore = (mainCore +1) % 2;
+  Serial.printf("Starting WebServer on core %d\n", webServerCore);
+  xTaskCreatePinnedToCore(serverTask, "https443", 6144, NULL, 1, NULL, webServerCore);
 #endif
 
   pinMode(BUS_INTERRUPT_PIN, INPUT_PULLUP);
