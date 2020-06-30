@@ -154,9 +154,9 @@ void AvWebserver::onPostCommand(HTTPRequest* request, HTTPResponse* response) {
     return;
   }
 
-  Serial.printf("Queuing command '%s' on device '%s'", commandName.c_str(), deviceName.c_str());
+  Serial.printf("Queuing command '%s' on device '%s'\n", commandName.c_str(), deviceName.c_str());
   Command combinedCommand((*device), command);
-  writer->queueCommand(combinedCommand);
+  instance->writer->queueCommand(combinedCommand);
 
   response->setStatusCode(202);
   delete[] buffer;
