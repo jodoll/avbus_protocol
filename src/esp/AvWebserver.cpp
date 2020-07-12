@@ -15,7 +15,7 @@ void AvWebserver::run(){
   Serial.println("Running server loop");
   while(isRunning) {
     instance->loop();
-    delay(1);
+    delay(20);
   }
   Serial.println("Leaving server loop");
 }
@@ -95,6 +95,7 @@ void AvWebserver::onPostCommand(HTTPRequest* request, HTTPResponse* response) {
   const size_t capacity = JSON_OBJECT_SIZE(2) + 50;
 
   char* buffer = new char[capacity + 1];
+  memset(buffer, 0, capacity+1);
   size_t readBytes = 0;
   while(!request->requestComplete() && readBytes < capacity){
     readBytes += request->readChars(buffer + readBytes, capacity - readBytes);
@@ -118,6 +119,7 @@ void AvWebserver::onPostCommand(HTTPRequest* request, HTTPResponse* response) {
     return;
   }
 
+  if (VERBOSE) Serial.println("Checking Device");
   const char* KEY_DEVICE = "device";
   if (!body.containsKey(KEY_DEVICE) || !body[KEY_DEVICE].is<std::string>()) {
     response->setStatusCode(400);
@@ -126,6 +128,8 @@ void AvWebserver::onPostCommand(HTTPRequest* request, HTTPResponse* response) {
     delete[] buffer;
     return;
   }
+
+  if (VERBOSE) Serial.println("Reading Device");
   std::string deviceName = body[KEY_DEVICE];
   const Device* device = Device::getDeviceByName(deviceName);
   if (device == nullptr) {
@@ -136,6 +140,7 @@ void AvWebserver::onPostCommand(HTTPRequest* request, HTTPResponse* response) {
     return;
   }
 
+  if (VERBOSE) Serial.println("Checking Command");
   const char* KEY_COMMAND = "command";
   if (!body.containsKey(KEY_COMMAND) || !body[KEY_COMMAND].is<std::string>()) {
     response->setStatusCode(400);
@@ -144,6 +149,8 @@ void AvWebserver::onPostCommand(HTTPRequest* request, HTTPResponse* response) {
     delete[] buffer;
     return;
   }
+
+  if (VERBOSE) Serial.println("Reading Command");
   std::string commandName = body[KEY_COMMAND];
   uint16_t command = (*device)[commandName];
   if (command == Device::Command::UNDEFINED) {
@@ -154,7 +161,7 @@ void AvWebserver::onPostCommand(HTTPRequest* request, HTTPResponse* response) {
     return;
   }
 
-  Serial.printf("Queuing command '%s' on device '%s'\n", commandName.c_str(), deviceName.c_str());
+  if (VERBOSE) Serial.printf("Queuing command '%s' on device '%s'\n", commandName.c_str(), deviceName.c_str());
   Command combinedCommand((*device), command);
   instance->writer->queueCommand(combinedCommand);
 

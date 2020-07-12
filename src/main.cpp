@@ -38,13 +38,13 @@ void onClockTick();
 void serverTask(void* params);
 
 #if defined(ESP32)
-EspAvBusClock avBusClock(CLOCK_FREQUENCY_HZ);
+EspAvBusClock* avBusClock = new EspAvBusClock(CLOCK_FREQUENCY_HZ);
 #elif defined(UNO)
-UnoAvBusClock avBusClock(CLOCK_FREQUENCY_HZ, CLOCK_INTERRUPT_PIN);
+UnoAvBusClock* avBusClock = new UnoAvBusClock(CLOCK_FREQUENCY_HZ, CLOCK_INTERRUPT_PIN);
 #endif
 
-AvBusReader reader(&avBusClock, BUS_INTERRUPT_PIN);
-AvBusWriter writer(&avBusClock, BUS_SEND_PIN);
+AvBusReader* reader = new AvBusReader(avBusClock, BUS_INTERRUPT_PIN);
+AvBusWriter* writer = new AvBusWriter(avBusClock, BUS_SEND_PIN);
 
 void setup() {
   Serial.begin(115200);
@@ -63,7 +63,7 @@ void setup() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  AvWebserver::setup(&writer);
+  AvWebserver::setup(writer);
   int mainCore = xPortGetCoreID();
   Serial.printf("Main loop is running on core %d\n", mainCore);
   int webServerCore = (mainCore +1) % 2;
@@ -77,8 +77,8 @@ void setup() {
 
   attachInterrupt(digitalPinToInterrupt(BUS_INTERRUPT_PIN), &busInterruptHandler, CHANGE);
 
-  avBusClock.init(&clockInterruptHandler);
-  avBusClock.registerTickCallback(&onClockTick);
+  avBusClock->init(&clockInterruptHandler);
+  avBusClock->registerTickCallback(&onClockTick);
 }
 
 void loop() {
@@ -88,11 +88,11 @@ void loop() {
 #endif
 }
 
-void clockInterruptHandler() { avBusClock.tick(); }
+void clockInterruptHandler() { avBusClock->tick(); }
 
-void busInterruptHandler() { reader.onBusValueChanged(); }
+void busInterruptHandler() { reader->onBusValueChanged(); }
 
-void onClockTick() { writer.onClockTick(); }
+void onClockTick() { writer->onClockTick(); }
 
 #if defined(ESP32)
 void serverTask(void* params) {
