@@ -1,5 +1,6 @@
 #include "esp/AvWebserver.hpp"
 #include "esp/Command.hpp"
+#include "esp/CertificateStore.hpp"
 #include <ArduinoJson.hpp>
 
 using namespace httpsserver;
@@ -25,25 +26,7 @@ void AvWebserver::tearDown(){
 }
 
 AvWebserver::AvWebserver(AvBusWriter* writer) : writer(writer) {
-  Serial.println("Creating SSL certificate");
-  certificate = new SSLCert();
-  int createCertResult = createSelfSignedCert(
-    *certificate,
-    KEYSIZE_2048,
-    "CN=avbus.fritz.box,O=JohannesDoll,C=DE",
-    "20200101000000",
-    "20310101000000"
-  );
-  //TODO: Store and reload certificate
-
-  // Now check if creating that worked
-  if (createCertResult != 0) {
-    Serial.printf("Cerating certificate failed. Error Code = 0x%02X, check SSLCert.hpp for details", createCertResult);
-    while(true) delay(500);
-  } else {
-    Serial.println("Successfully created certificate");
-  }
-
+  SSLCert* certificate = CertificateStore::getInstance()->getCertificate();
   server = new HTTPSServer(certificate);
   ResourceNode* defaultNode = new ResourceNode("", "GET", &onNotFound);
   ResourceNode* rootNode = new ResourceNode("/", "GET", &onGetRoot);
@@ -166,5 +149,7 @@ void AvWebserver::onPostCommand(HTTPRequest* request, HTTPResponse* response) {
   instance->writer->queueCommand(combinedCommand);
 
   response->setStatusCode(202);
+  response->setStatusText("Accepted");
+  response->println("202 Command quequed");
   delete[] buffer;
 }

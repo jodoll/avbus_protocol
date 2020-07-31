@@ -6,7 +6,9 @@
 #include "project.hpp"
 
 #if defined(ESP32)
+#include <SPIFFS.h>
 #include "esp/AvWebserver.hpp"
+#include "esp/CertificateStore.hpp"
 #include "esp/EspAvBusClock.hpp"
 #elif defined(UNO)
 #include "uno/UnoAvBusClock.hpp"
@@ -35,7 +37,11 @@ constexpr uint32_t CLOCK_FREQUENCY_HZ = 8000;
 void clockInterruptHandler();
 void busInterruptHandler();
 void onClockTick();
+
+#if defined(ESP32)
+void setupFileSystem();
 void serverTask(void* params);
+#endif
 
 #if defined(ESP32)
 EspAvBusClock* avBusClock = new EspAvBusClock(CLOCK_FREQUENCY_HZ);
@@ -51,6 +57,9 @@ void setup() {
   Serial.println("Starting up...");
 
 #if defined(ESP32)
+  setupFileSystem();
+  CertificateStore::getInstance()->getCertificate();
+
   Serial.print("Connecting to: ");
   Serial.print(WIFI_SSID);
   WiFi.setHostname("avbus"); //TODO: Move this to a build flag
@@ -95,6 +104,32 @@ void busInterruptHandler() { reader->onBusValueChanged(); }
 void onClockTick() { writer->onClockTick(); }
 
 #if defined(ESP32)
+/**
+ * This function is mostly taken from https://github.com/fhessel/esp32_https_server
+ * released under the MIT License by Frank Hessel.
+ */
+void setupFileSystem() {
+  // Try to mount SPIFFS without formatting on failure
+  if (!SPIFFS.begin(false)) {
+    // If SPIFFS does not work, we wait for serial connection...
+    while(!Serial);
+    delay(1000);
+
+    // Ask to format SPIFFS using serial interface
+    Serial.print("Mounting SPIFFS failed. Try formatting? (y/n): ");
+    while(!Serial.available());
+    Serial.println();
+
+    // If the user did not accept to try formatting SPIFFS or formatting failed:
+    if (Serial.read() != 'y' || !SPIFFS.begin(true)) {
+      Serial.println("SPIFFS not available. Stop.");
+      while(true);
+    }
+    Serial.println("SPIFFS has been formated.");
+  }
+  Serial.println("SPIFFS has been mounted.");
+}
+
 void serverTask(void* params) {
   AvWebserver::run();
   AvWebserver::tearDown();
