@@ -47,23 +47,52 @@ The Fritzing source file can be found in [circuit](circuit/).
 [AvBus_Esp32.fzz](circuit/AvBus_Esp32.fzz)
 
 ## Protocol
+The following section describes the protocol.
 
+> DISCLAIMER: The captures shown in the screenshots were captured with [sigrok/PulseView](https://sigrok.org/wiki/Main_Page)
+
+### Frame
 The default state of the Bus signal is `HIGH`.
 
-The commands seem to have the following structure:
-* The bus is pulled to `LOW` for around 10.125 ms (5.626 ms seem to be enough) (`INIT`)
-* Then the command follows
-  * Structure
-    * 6 bit device address
-    * 9 bit command
-  * The values are determined by a delay before the next change of the bus value
-    * 0 -> 0.375 ms 
-    * 1 -> 0.750 ms
-* The bus is pulled to `LOW` again for some time between 100 ms and 200 ms (5.626 ms seem to be enough) (`HOLD`)
-  * When the key on the remote control is held down the bus stays `LOW` until the key is released and the command is executed again by the device
+Each frame has the following structure:
+| Init  | Data         | Outro  |
+|-------|--------------|--------|
+| 100ms | 8 Bits a 1ms | 282 ms |
 
-Notes: 
-* The timings may be off a good deal due to the sampling rate of 8kHz. This also leads to some alias.
+![Capture of a frame](img/capture_full.png)
+
+> NOTE: Not the full outro is shown here as it is much to long.
+
+This sums up to 300ms for each transmitted signal.
+The Init and Outro pull the bus to `LOW`.
+
+
+### Bits
+
+A bit is 1ms long. The bus is pulled to `HIGH` to start a bit and then pulled to `LOW`.
+For a `1` the the `HIGH` phase lasts for `300us` for a `0` for `700us`.
+The remaining time the bus is at `LOW`.
+
+| 1 | 0 |
+|:-:| :-:|
+|![Capture of a 1](img/capture_one.png)|![Capture of a 0](img/capture_zero.png)|
+| 300us `HIGH` | 700us `HIGH` |
+
+### Data
+The data section of each frame consists of 8 bits.
+The first four for the Device and the other four for the command.
+
+
+Let's take the following capture of the `Amp | Volume Down` command as an example:
+
+![Capture of Amp Volume Down (device marked)](img/capture_device.png)
+
+The marked part corresponds to the first four Bits which define the device. They are `0b1011` or `0xB` which corresponds to `Amp`.
+
+![Capture of Amp Volume Down (command marked)](img/capture_command.png)
+
+
+The command is `0b1101` or `0xD` which means `Volume Up` when combined with `Amp`.
 
 ## Third Party Software
 
