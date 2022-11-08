@@ -57,7 +57,7 @@ The default state of the Bus signal is `HIGH`.
 Each frame has the following structure:
 | Init  | Data         | Outro  |
 |-------|--------------|--------|
-| 100ms | 8 Bits a 1ms | 282 ms |
+| 10ms | 8 Bits a 1ms | 282 ms |
 
 ![Capture of a frame](img/capture_full.png)
 
