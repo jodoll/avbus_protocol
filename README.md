@@ -1,8 +1,13 @@
-# Arduino AVBus
+# AVBus Protocol
 
-This Project aims to reengineer the AVBus protocol of the Marantz ST560 Stereo Tuner.
+This Project aims to reverse engineer the AVBus protocol of the Marantz ST560 Stereo Tuner.
 
 Using the AVBus protocol it is also possible to control multiple HiFi devices from that device line, for example the PM451 Amplifier.
+
+The main purpose of this repo is to serve as documentation.
+The code in here were my first attempts and I'll consider removing them.
+For a implementation of my findings here, I plan on an integration into [ESPHome](https://esphome.io/).
+You can Check my progress [here](https://github.com/jodoll/esphome) (documentation will follwo, for now search for ExternalModules to use it).
 
 ## Devices
 
@@ -18,33 +23,12 @@ Using the AVBus protocol it is also possible to control multiple HiFi devices fr
 ### PM-451
 ![](img/pm451.jpg)
 
-## Building
-The project is built with [PlatformIO](https://platformio.org/). Their version of Visual Studio code is used to built the project. Please refer to their documentation on how to setup their SDK. 
-
-Afterwards the project can be opened and should work out of the box on a mac, provided you have set up your USB drivers. For other platforms you may need to add a config to the [platformio.ini](platformio.ini). Please refer to PlatformIO for [instructions](https://docs.platformio.org/en/latest/projectconf.html) on how to do so.
-
-## Project Setup
-
-The 32kHz output of a DS3231 is used to generate a clock signal to measure the time between bus signal changes. The signal is connected to one of the interrupt pins of the Arduino Uno (Pin 2).
-
-The other interrupt pin (Pin 3) is connected to the Remote Control line of the AVBus. Every time the bus changes state the time is stored. 
-
-Notes:
+## Ports
 * There seems to be no difference between the IN and OUT jack
-* Writing to the bus while reading seems possible, but the input from the RMC-20AV seems to be blocked (See [Todo](#Todo))
-
-### Circuit
-Breadboard and PCB design were created with [Fritzing](https://fritzing.org/).  
-The Fritzing source file can be found in [circuit](circuit/).
-
-#### ESP32
-**PCB**  
-![ESP32 PCB](img/pcb_esp32.png)
-
-**Breadboard**  
-![ESP32 Breadboard](img/breadboard_esp32.png)
-
-[AvBus_Esp32.fzz](circuit/AvBus_Esp32.fzz)
+* It seems like most of the frames are sent on the Remote Control Bus (the orange one).
+I currently have no clue what the EasyBus (green) is for.
+* Voltage on the bus is 5V
+* The default state of the Bus signal is `HIGH`.
 
 ## Protocol
 The following section describes the protocol.
@@ -52,20 +36,17 @@ The following section describes the protocol.
 > DISCLAIMER: The captures shown in the screenshots were captured with [sigrok/PulseView](https://sigrok.org/wiki/Main_Page)
 
 ### Frame
-The default state of the Bus signal is `HIGH`.
+![Capture of a frame](img/capture_full.png)
+> NOTE: Not the full Footer is shown here as it is much to long.
 
 Each frame has the following structure:
-| Init  | Data         | Outro  |
-|-------|--------------|--------|
+
+| Header | Data | Footer |
+|:-|:-|:-|
 | 10ms | 8 Bits a 1ms | 282 ms |
 
-![Capture of a frame](img/capture_full.png)
-
-> NOTE: Not the full outro is shown here as it is much to long.
-
 This sums up to 300ms for each transmitted signal.
-The Init and Outro pull the bus to `LOW`.
-
+The Header and Footer pull the bus to `LOW`.
 
 ### Bits
 
@@ -80,8 +61,13 @@ The remaining time the bus is at `LOW`.
 
 ### Data
 The data section of each frame consists of 8 bits.
-The first four for the Device and the other four for the command.
+It seems like the first 3 Bits define the device and the remaining ones the command.
 
+> WARNING:
+> 
+> The commands never overlap so maybe it's just a coincidence that the devices start with the same 3 bits. 
+> On top of that, some commands for TV that should be sent aren't.
+> Some investigation is needed whether they may be sent on the EasyBus.
 
 Let's take the following capture of the `Amp | Volume Down` command as an example:
 
@@ -91,8 +77,12 @@ The marked part corresponds to the first four Bits which define the device. They
 
 ![Capture of Amp Volume Down (command marked)](img/capture_command.png)
 
-
 The command is `0b11101` or `0xD` which means `Volume Down` when combined with `Amp`.
+
+### Repeat
+
+To repeat a signal the Footer is just extended by keeping the bus at `LOW` for the time the key is held on the remote.
+Exact timings need to be checked.
 
 ## Codes
 
@@ -165,20 +155,9 @@ The command is `0b11101` or `0xD` which means `Volume Down` when combined with `
 ## Todo
 ### Protocol
 - [x] Record and protocol all signals
-- [ ] Narrow down timings for INIT, 0, 1 and HOLD
-- [ ] What's the threshold where HOLD makes a device repeat the command 
-
-### Circuit
-- [x] Check if the DS3231 signal is required (at least not for ESP32)
-- [ ] Do not block the bus to allow for side by side operation with RMC-20AV
+- [X] Narrow down timings for HEADER, 0, 1 and FOOTER
+- [ ] What's the threshold where FOOTER makes a device repeat the command 
 
 ### Documentation
 - [x] Add diagram of wiring
-- [ ] Add diagram of the bus signals
-- [ ] Add REST api documentation
-
-### Features
-- [x] Allow sending of arbitrary commands
-- [x] ESP32 port to support a webserver/bt
-- [x] Add a Webserver on ESP32
-- [ ] Android app to act as a remote control (check the status of the project [here](https://github.com/jodoll/avbus_android/))
+- [x] Add diagram of the bus signals
