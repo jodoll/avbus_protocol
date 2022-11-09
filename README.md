@@ -87,12 +87,65 @@ Let's take the following capture of the `Amp | Volume Down` command as an exampl
 
 ![Capture of Amp Volume Down (device marked)](img/capture_device.png)
 
-The marked part corresponds to the first four Bits which define the device. They are `0b1011` or `0xB` which corresponds to `Amp`.
+The marked part corresponds to the first four Bits which define the device. They are `0b101` or `5` which corresponds to `Amp`.
 
 ![Capture of Amp Volume Down (command marked)](img/capture_command.png)
 
 
-The command is `0b1101` or `0xD` which means `Volume Up` when combined with `Amp`.
+The command is `0b11101` or `0xD` which means `Volume Down` when combined with `Amp`.
+
+## Codes
+
+| Device | Address | Function | Command | 
+| :-: | :-: | :-: | :-: |
+| Amp | `5` | Vol+ (Front) | `0x1E` | 
+|     |     | Vol- (Front) | `0x1D` |
+|     |     | Vol+ (Rear) | `0x02` |
+|     |     | Vol- (Rear) | `0x12` |
+|     |     | Mute | `0x13` |
+|     |     | Tuner | `0x0A` |
+|     |     | Phono | `0x08` |
+|     |     | CD | `0x11` |
+|     |     | Tape | `0x18` |
+|     |     | TV | `0x09` |
+|     |     | Video | `0x07` |
+|     |     | VCR | `0x06` |
+| Tuner | `6` | AM | `0x05` | 
+|       |     | FM | `0x04` | 
+|       |     | Tune Down | `0x00` | 
+|       |     | Tune Up | `0x01` | 
+|       |     | 1 | `0x0E` | 
+|       |     | 2 | `0x0D` | 
+|       |     | 3 | `0x0C` | 
+|       |     | 4 | `0x0B` | 
+|       |     | 5 | `0x0A` | 
+|       |     | 6 | `0x09` | 
+|       |     | 7 | `0x08` | 
+|       |     | 8 | `0x07` | 
+| Tape | `3` | Play | `0x1E` | 
+|      |     | Stop | `0x1B` | 
+|      |     | Rewind | `0x1D` | 
+|      |     | Forward | `0x1C` | 
+|      |     | Pause | `0x1A` | 
+|      |     | Record | `0x12` | 
+|      |     | Record Mute | `0x18` | 
+|      |     | Direction | `0x15` | 
+|      |     | Index Scan | `0x19` | 
+|      |     | QMS | `0x14` | 
+|      |     | Memo | `0x17` | 
+| Phono | `6` | Play | `0x1E` | 
+|       |     | Cut | `0x1B` | 
+|       |     | Cue | `0x1A` | 
+|       |     | Repeat | `0x16` | 
+| VCR | `2` | Selector | `0x15` | 
+|     |     | Memo | `0x17` | 
+|     |     | Record Mute | `0x18` | 
+| TV | `7` | Play/Next | `0x1E` | 
+|     |     | Stop/C | `0x1B` | 
+|     |     | Pause | `0x1A` | 
+|     |     | Repeat | `0x16` | 
+| System | `1` | 1 | `0x1B` | 
+|        |     | 2 | `0x1A` | 
 
 ## Third Party Software
 
