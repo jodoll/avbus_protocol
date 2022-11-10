@@ -6,8 +6,9 @@ Using the AVBus protocol it is also possible to control multiple HiFi devices fr
 
 The main purpose of this repo is to serve as documentation.
 The code in here were my first attempts and I'll consider removing them.
-For a implementation of my findings here, I plan on an integration into [ESPHome](https://esphome.io/).
-You can Check my progress [here](https://github.com/jodoll/esphome) (documentation will follwo, for now search for ExternalModules to use it).
+
+Instead there's an implementation of the protocol for [ESPHome](https://esphome.io/).
+For details have a look at the [ESPHome Section](#esp-home-integration), or check out the sources in the [AVBus Fork](https://github.com/jodoll/esphome) of ESPHome.
 
 ## Devices
 
@@ -73,11 +74,11 @@ Let's take the following capture of the `Amp | Volume Down` command as an exampl
 
 ![Capture of Amp Volume Down (device marked)](img/capture_device.png)
 
-The marked part corresponds to the first four Bits which define the device. They are `0b101` or `5` which corresponds to `Amp`.
+The first three bits are `0b101` or `5` which corresponds to `Amp`.
 
 ![Capture of Amp Volume Down (command marked)](img/capture_command.png)
 
-The command is `0b11101` or `0xD` which means `Volume Down` when combined with `Amp`.
+The last five bits are the command, which are `0b11101` or `0xD` which in turn means `Volume Down` when combined with `Amp`.
 
 ### Repeat
 
@@ -137,6 +138,90 @@ Exact timings need to be checked.
 | System | `1` | 1 | `0x1B` | 
 |        |     | 2 | `0x1A` | 
 
+## ESP Home Integration
+
+I found it very convenient to integrate this protocol into [ESPHome](https://esphome.io).
+With a little bit of circuitry, an ESP and some spare time, you will quickly be up an running.
+
+If you haven't done so, start with setting ESPHome by following their guide. 
+
+To use the AVBus Protocol you can find a ready made custom component [here](https://github.com/jodoll/esphome).
+### Configuration
+To use the custom component, include it in you ESPHome device config:
+
+```yaml
+external_components:
+  # use remote_receiver/remote_transmitter with AvBus support
+  - source:
+      type: git
+      url: https://github.com/jodoll/esphome
+      ref: avbus_protocol
+    components: [ remote_receiver, remote_base, remote_transmitter ]
+```
+
+Then follow the instructions for [remote transmitter/receiver](https://esphome.io/components/remote_transmitter.html) in the official documentation.
+
+#### Receiver
+When including the external component, there's the `avbus` protocol available.
+Make sure you set `idle` to at least `11ms`, as the Header of the protocol is `10ms` long.
+When using a value that is too big, the receiver might not be able to decode values in fast sequence (it needs to wait until the signal is completed (idle) before moving on with the next one).
+I found that `20ms` works quite well.
+
+```yaml
+remote_receiver:
+  dump: avbus
+  pin: D2
+  idle: 20ms
+```
+
+#### Transmitter
+There's nothing special about the transmitter, just make sure to set `carrier_duty_percent` to `100%`.
+
+```yaml
+remote_transmitter:
+  pin: D3
+  carrier_duty_percent: 100%
+```
+
+#### Devices & Co.
+Defining switches, automations, etc. is similar to other protocols, just us `avbus` as name.
+
+```yaml
+# Individual switches
+switch:
+  - platform: template
+    name: "AvBus Amp Vol Up"
+    turn_on_action:
+      remote_transmitter.transmit_avbus:
+        address: 5
+        command: 0x1E
+```
+
+### Circuit
+Here's how I've done the wiring for my ESPHome.
+It' might not be perfect, but it seems to work.
+
+Note that the inversion of the signal for the receiver is (probably) not needed, as ESPHome will detect what's idle and will adjust accordingly.  
+On the transmitting side, however, signal inversion is a must.
+
+> CAUTION: The bus works at `5V` while ESPs work at `3,3V`.
+> Don't just connect the bus to a pin without a transistor.
+> You'll damage your ESP!
+
+![ESPHome Bread Board](img/AvBus_EspHome_bb.png)
+
+![ESPHome Circuit](img/AvBus_EspHome_schem.png)
+
+### Used Parts
+
+| Name | Description | Amount |
+| ---- | ----------- | ------ |
+| Q1, Q2 | BC547B | 2 |
+| R1 | Resistor 1 kOhm | 1 |
+| R2, R3 | Resistor 10 kOhm | 2 |
+| R4 | Resistor 1500 Ohm | 1 |
+| AvBus Output | RCA Jack | 1 |
+
 ## Third Party Software
 
 * [ArduinoJson](https://github.com/bblanchon/ArduinoJson) ([MIT](https://github.com/bblanchon/ArduinoJson/blob/6.x/LICENSE.md))
@@ -153,6 +238,8 @@ Exact timings need to be checked.
 * [Wire](http://arduino.cc/en/Reference/Wire) (LGPL v2.1)
 
 ## Todo
+### Electrical
+- [ ] It seems the ST560 somehow get's stuck and doesn't accept any singnals from an actual remote control anymore when the ESP restarts while connected
 ### Protocol
 - [x] Record and protocol all signals
 - [X] Narrow down timings for HEADER, 0, 1 and FOOTER
